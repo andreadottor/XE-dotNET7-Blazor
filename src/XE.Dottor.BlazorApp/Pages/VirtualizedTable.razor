@@ -1,0 +1,38 @@
+﻿@page "/virtualized-table"
+
+<HeadContent>
+    <style>
+        html, body {
+            overflow-y: scroll
+        }
+
+        /*.grid-container{
+            overflow-y: scroll;
+            height: 500px;
+        }*/
+    </style>
+</HeadContent>
+
+<h1>Virtualized Table Example</h1>
+
+<div class="grid-container">
+<table id="virtualized-table">
+    <thead style="position: sticky; top: 0; background-color: silver">
+        <tr>
+            <th>Item</th>
+            <th>Another column</th>
+        </tr>
+    </thead>
+    <tbody>
+        <Virtualize Items="@fixedItems" ItemSize="30" SpacerElement="tr">
+            <tr @key="context" style="height: 30px;" id="row-@context">
+                <td>Item @context</td>
+                <td>Another value</td>
+            </tr>
+        </Virtualize>
+    </tbody>
+</table>
+</div>
+@code {
+    private List<int> fixedItems = Enumerable.Range(0, 1000).ToList();
+}

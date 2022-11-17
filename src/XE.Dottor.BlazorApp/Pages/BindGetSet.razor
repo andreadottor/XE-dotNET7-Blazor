@@ -1,0 +1,11 @@
+﻿<h3>BindGetSet</h3>
+
+@*<input @bind:get="Value" @bind:set="ValueChanged" />
+
+@code {
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+}*@

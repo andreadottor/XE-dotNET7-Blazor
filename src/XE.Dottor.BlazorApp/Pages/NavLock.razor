@@ -1,0 +1,72 @@
+﻿@page "/nav-lock"
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+
+<NavigationLock ConfirmExternalNavigation="@(editContext!.IsModified())" 
+                OnBeforeInternalNavigation="OnBeforeInternalNavigation" />
+
+<EditForm EditContext="editContext" OnValidSubmit="Save">
+
+    <div class="form-group">
+        <label>
+            Name
+            <InputText @bind-Value="Name" class="form-control" />
+        </label>
+    </div>
+
+    <div class="form-group">
+        <label>
+            Surname
+            <InputText @bind-Value="Surname" class="form-control" />
+        </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3 mb-3">Save @(editContext.IsModified() ? " (modified)" : "")</button>
+</EditForm>
+
+
+@if (savedChanges && !editContext.IsModified())
+{
+    <p><div class="alert alert-success">✓ Changes saved</div></p>
+}
+
+
+@code {
+    private EditContext editContext = default!;
+
+    public string Name { get; set; } = string.Empty;
+    public string Surname { get; set; } = string.Empty;
+
+    private bool savedChanges;
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(this);
+        editContext.SetFieldCssClassProvider(new BootstrapClassProvider());
+    }
+
+    private void Save()
+    {
+        if (editContext.IsModified())
+        {
+            // esguo salvataggio
+            editContext.MarkAsUnmodified();
+            savedChanges = true;
+        }
+    }
+
+    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
+    {
+        if (editContext.IsModified())
+        {
+            var isConfirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Discard your changes?");
+
+            if (!isConfirmed)
+            {
+                context.PreventNavigation();
+            }
+        }
+    }
+
+
+}

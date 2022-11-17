@@ -1,0 +1,36 @@
+﻿@page "/nav-handler"
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<p>
+    <button @onclick="@(() => Navigation.NavigateTo("/"))">
+        Home (Allowed)
+    </button>
+    <button @onclick="@(() => Navigation.NavigateTo("/counter"))">
+        Counter (Prevented)
+    </button>
+</p>
+
+@code {
+    private IDisposable? registration;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            registration =
+                Navigation.RegisterLocationChangingHandler(OnLocationChanging);
+        }
+    }
+
+    private async ValueTask OnLocationChanging(LocationChangingContext context)
+    {
+        if (context.TargetLocation == "/counter")
+        {
+            await Task.Yield();
+            context.PreventNavigation();
+        }
+    }
+
+    public void Dispose() => registration?.Dispose();
+}
